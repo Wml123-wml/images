@@ -1,0 +1,1011 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>S101 测量功能操作说明</title>
+<style>
+  :root {
+    --primary: #005eb8;
+    --primary-dark: #004a94;
+    --text: #1a1a1a;
+    --text-secondary: #555;
+    --bg: #fff;
+    --bg-alt: #f5f7fa;
+    --border: #e0e0e0;
+    --radius: 6px;
+    --shadow: 0 2px 8px rgba(0,0,0,.08);
+    --max-width: 1200px;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body { font-family: "Microsoft YaHei", "PingFang SC", "Helvetica Neue", Arial, sans-serif; color: var(--text); background: var(--bg); line-height: 1.7; }
+  a { color: var(--primary); text-decoration: none; }
+  ul, ol { padding-left: 1.5rem; }
+  li { margin-bottom: .5rem; }
+
+  /* ===== 顶部主导航：玻璃质感 + 渐变品牌色 ===== */
+  .site-header {
+    position: sticky; top: 0; z-index: 200;
+    background: rgba(255, 255, 255, 0.82);
+    backdrop-filter: saturate(180%) blur(20px);
+    -webkit-backdrop-filter: saturate(180%) blur(20px);
+    border-bottom: 1px solid rgba(0, 94, 184, 0.08);
+    box-shadow: 0 1px 24px rgba(0, 94, 184, 0.06);
+  }
+  .header-inner {
+    width: 100%;                      /* 占满整屏 */
+    margin: 0 auto;
+    padding: 0 max(2rem, 5vw);        /* 随视口/缩放动态变化，大屏更舒展 */
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 72px;
+  }
+  .logo { display: flex; align-items: center; gap: .85rem; text-decoration: none; transition: opacity .2s; }
+  .logo:hover { opacity: .85; }
+  .logo img { height: 38px; width: auto; display: block; border-radius: 6px; }
+  .logo-text { display: flex; flex-direction: column; line-height: 1.2; }
+  .logo-title {
+    font-size: 1rem; font-weight: 800; letter-spacing: 1.2px;
+    background: linear-gradient(135deg, #005eb8 0%, #0078e0 60%, #00a0ff 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    color: transparent;
+  }
+  .logo-subtitle { font-size: .65rem; color: var(--text-secondary); letter-spacing: .6px; margin-top: 3px; }
+  /* 右侧导航组：主导航 + 语言切换（固定组合，不占额外空间） */
+  .header-right { display: flex; align-items: center; gap: 1.5rem; margin-left: auto; }
+  .main-nav { display: flex; gap: 2.5rem; align-items: center; }
+  .main-nav a {
+    position: relative;
+    font-size: .95rem; font-weight: 500;
+    color: var(--text);
+    padding: .5rem 0;
+    transition: color .25s;
+  }
+  .main-nav a::after {
+    content: "";
+    position: absolute;
+    left: 50%; bottom: 0;
+    width: 0; height: 2px;
+    background: linear-gradient(90deg, #005eb8, #0078e0);
+    transition: all .3s cubic-bezier(0.4, 0, 0.2, 1);
+    transform: translateX(-50%);
+    border-radius: 2px;
+  }
+  .main-nav a:hover { color: var(--primary); }
+  .main-nav a:hover::after { width: 100%; }
+  /* ===== CTA 按钮：渐变 + 光晕 + 箭头动效 ===== */
+  .cta-btn {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    gap: .5rem;
+    background: linear-gradient(135deg, #005eb8 0%, #0078e0 55%, #00a0ff 100%);
+    color: #fff;
+    padding: .7rem 1.8rem .7rem 1.5rem;
+    border-radius: 28px;
+    font-size: .92rem; font-weight: 700;
+    letter-spacing: .5px;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+    box-shadow:
+      0 4px 16px rgba(0, 94, 184, 0.35),
+      inset 0 1px 0 rgba(255, 255, 255, 0.25);
+    transition: all .35s cubic-bezier(0.34, 1.56, 0.64, 1);
+    overflow: hidden;
+    border: 1px solid rgba(255, 255, 255, 0.18);
+  }
+  .cta-btn::after {
+    content: "→";
+    font-size: 1.05rem;
+    line-height: 1;
+    transition: transform .35s cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+  .cta-btn:hover {
+    transform: translateY(-2px) scale(1.03);
+    filter: brightness(1.08);
+    box-shadow:
+      0 8px 26px rgba(0, 94, 184, 0.48),
+      0 0 0 4px rgba(0, 94, 184, 0.1),
+      inset 0 1px 0 rgba(255, 255, 255, 0.35);
+  }
+  .cta-btn:hover::after { transform: translateX(4px); }
+
+  /* ===== 语言切换：固定宽度胶囊，切换时不引起布局跳动 ===== */
+  .lang-switch {
+    display: inline-flex;
+    align-items: center;
+    background: rgba(0, 94, 184, 0.06);
+    border: 1px solid rgba(0, 94, 184, 0.16);
+    border-radius: 20px;
+    padding: 3px;
+    flex-shrink: 0;
+  }
+  .lang-btn {
+    appearance: none;
+    border: none;
+    background: transparent;
+    font: inherit;
+    font-size: .82rem;
+    font-weight: 700;
+    line-height: 1;
+    color: var(--text-secondary);
+    padding: .45rem .2rem;
+    width: 46px;
+    text-align: center;
+    border-radius: 16px;
+    cursor: pointer;
+    transition: all .25s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  .lang-btn:hover { color: var(--primary); }
+  .lang-btn.active {
+    background: linear-gradient(135deg, #005eb8 0%, #0078e0 100%);
+    color: #fff;
+    box-shadow: 0 2px 8px rgba(0, 94, 184, 0.3);
+  }
+
+  /* ===== 锚点 Tab 导航：玻璃质感 + 动画下划线 ===== */
+  .anchor-bar {
+    position: sticky; top: 72px; z-index: 100;
+    background: rgba(255, 255, 255, 0.92);
+    backdrop-filter: saturate(180%) blur(16px);
+    -webkit-backdrop-filter: saturate(180%) blur(16px);
+    border-bottom: 1px solid var(--border);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+  }
+  .anchor-inner {
+    width: 100%;                      /* 与主导航对齐：占满整屏 */
+    margin: 0 auto;
+    padding: 0 max(2rem, 5vw);        /* 随视口/缩放动态变化 */
+    display: flex;
+    gap: 2.5rem;
+    overflow-x: auto;
+    align-items: center;
+    height: 56px;
+  }
+  .anchor-inner a {
+    position: relative;
+    white-space: nowrap;
+    padding: .5rem 0;
+    font-size: .95rem; font-weight: 600;
+    color: var(--text-secondary);
+    transition: color .25s;
+  }
+  .anchor-inner a::after {
+    content: "";
+    position: absolute;
+    left: 50%; bottom: 0;
+    width: 0; height: 3px;
+    background: linear-gradient(90deg, #005eb8, #0078e0);
+    border-radius: 3px 3px 0 0;
+    transition: all .3s cubic-bezier(0.4, 0, 0.2, 1);
+    transform: translateX(-50%);
+  }
+  .anchor-inner a:hover { color: var(--primary); }
+  .anchor-inner a:hover::after { width: 60%; }
+  .anchor-inner a.active { color: var(--primary); }
+  .anchor-inner a.active::after { width: 100%; }
+
+  /* Hero */
+  .hero { background: linear-gradient(135deg, #f5f7fa 0%, #e8eef5 100%); padding: 4rem 1.5rem; text-align: center; }
+  .hero-inner { max-width: var(--max-width); margin: 0 auto; }
+  .hero h1 { font-size: 2.25rem; font-weight: 700; margin-bottom: .75rem; letter-spacing: -.5px; }
+  .hero p { font-size: 1.1rem; color: var(--text-secondary); max-width: 700px; margin: 0 auto; }
+  .hero-actions { margin-top: 1.75rem; display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap; }
+
+  /* Sections */
+  .section { padding: 4rem 1.5rem; }
+  .section:nth-child(even) { background: var(--bg-alt); }
+  .section-inner { max-width: var(--max-width); margin: 0 auto; }
+  .section-header { margin-bottom: 2.5rem; }
+  .section-header h2 { font-size: 1.75rem; font-weight: 700; color: var(--text); margin-bottom: .5rem; }
+  .section-header p { color: var(--text-secondary); font-size: 1rem; }
+
+  /* Page Layout: 左侧侧边栏 + 主内容 */
+  .page-layout { display: flex; align-items: flex-start; max-width: var(--max-width); margin: 0 auto; }
+  .main-content { flex: 1; min-width: 0; }
+
+  /* ===== 左侧测量功能导航：渐变标题 + 激活项左侧条 + 编号徽章 ===== */
+  .sidebar {
+    width: 260px;
+    flex-shrink: 0;
+    position: sticky;
+    top: 144px;             /* 头部(72) + Tab(56) + 16 间距 */
+    bottom: 1.5rem;         /* 底部留白 */
+    align-self: flex-start;
+    padding: 1.5rem 1rem 1.5rem 0;
+    height: calc(100vh - 144px - 1.5rem);  /* 撑满可视区域高度 */
+  }
+  .sidebar-inner {
+    background: #fff;
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06);
+    padding: 0;
+    overflow: hidden;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+  }
+  .sidebar-title {
+    font-size: 1rem;
+    font-weight: 700;
+    color: #fff;
+    padding: 1rem 1.25rem;
+    background: linear-gradient(135deg, #005eb8 0%, #0078e0 100%);
+    display: flex;
+    align-items: center;
+    gap: .6rem;
+    letter-spacing: .3px;
+    position: relative;
+  }
+  .sidebar-title::before {
+    content: "📐";
+    font-size: 1.05rem;
+    line-height: 1;
+    filter: brightness(1.1);
+  }
+  .sidebar-title::after {
+    content: "";
+    position: absolute;
+    left: 0; right: 0; bottom: -1px;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
+  }
+  .sidebar-nav { list-style: none; padding: .75rem 0; margin: 0; flex: 1; display: flex; flex-direction: column; }
+  .sidebar-nav li { margin: 0; position: relative; }
+  .sidebar-nav a {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: .85rem;
+    padding: .85rem 1.25rem .85rem 1.1rem;
+    font-size: .9rem;
+    color: var(--text-secondary);
+    transition: all .28s cubic-bezier(0.4, 0, 0.2, 1);
+    border-left: 3px solid transparent;
+    margin: 0 .35rem;
+    border-radius: 0 8px 8px 0;
+  }
+  .sidebar-nav a:hover {
+    color: var(--primary);
+    background: linear-gradient(90deg, rgba(0, 94, 184, 0.06) 0%, rgba(0, 94, 184, 0.01) 100%);
+    transform: translateX(3px);
+  }
+  .sidebar-nav a.active {
+    color: var(--primary);
+    background: linear-gradient(90deg, rgba(0, 94, 184, 0.1) 0%, rgba(0, 94, 184, 0.02) 100%);
+    border-left-color: var(--primary);
+    font-weight: 600;
+    transform: translateX(3px);
+  }
+  .sidebar-num {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 28px; height: 28px;
+    background: #f0f2f5;
+    color: var(--text-secondary);
+    border-radius: 8px;
+    font-size: .85rem;
+    font-weight: 700;
+    flex-shrink: 0;
+    transition: all .28s;
+  }
+  .sidebar-nav a:hover .sidebar-num {
+    background: #fff;
+    color: var(--primary);
+    box-shadow: 0 2px 8px rgba(0, 94, 184, 0.15);
+  }
+  .sidebar-nav a.active .sidebar-num {
+    background: linear-gradient(135deg, #005eb8 0%, #0078e0 100%);
+    color: #fff;
+    box-shadow: 0 3px 10px rgba(0, 94, 184, 0.3);
+  }
+
+  /* Feature Rows */
+  .feature-row { display: flex; gap: 3.5rem; align-items: center; }
+  .feature-row:nth-child(even) { flex-direction: row-reverse; }
+  /* 5. 深度测量 与 7. 平面夹角测量：解释在左、图片在右 */
+  #depth .feature-row,
+  #plane-angle .feature-row { flex-direction: row; }
+  /* 4. 点到线 与 6. 区域深度：图片在左、文字在右（覆盖全局 nth-child(even) 的 row-reverse） */
+  #point-line .feature-row,
+  #area-depth .feature-row { flex-direction: row; }
+  /* 4. 点到线 与 6. 区域深度：图片在左、文字在右，默认左右分离；进入视口后合拢 */
+  /* 图与文都使用固定 45% 宽度，动画过程中尺寸不发生任何变化 */
+  #point-line .feature-image,
+  #area-depth .feature-image {
+    order: 1;                 /* 图在视觉左侧 */
+    flex: 0 0 45%;
+    width: 45%;
+  }
+  #point-line .feature-text,
+  #area-depth .feature-text {
+    order: 2;                 /* 文在视觉右侧 */
+    flex: 0 0 45%;
+    width: 45%;
+  }
+  #point-line .feature-row,
+  #area-depth .feature-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;   /* 默认：图左 / 文右，中间 10% 间距 */
+    gap: 0;
+    transition: justify-content 1.4s cubic-bezier(0.25, 0.1, 0.25, 1),
+                gap 1.4s cubic-bezier(0.25, 0.1, 0.25, 1);
+  }
+  /* 进入视口：两端向中间合并，靠左排列并保留 2.5rem 间隙 */
+  #point-line .feature-row.in-view,
+  #area-depth .feature-row.in-view {
+    justify-content: flex-start;
+    gap: 2.5rem;
+  }
+  .feature-text { flex: 1; min-width: 0; }
+  .feature-image { flex: 1; min-width: 0; }
+  .feature-image img { max-width: 100%; height: auto; width: auto; display: block; margin: 0 auto; border-radius: var(--radius); box-shadow: var(--shadow); border: 1px solid var(--border); }
+  .feature-image .caption { text-align: center; font-size: .85rem; color: var(--text-secondary); margin-top: .75rem; }
+
+  .section-subtitle { font-size: 1.15rem; font-weight: 700; color: var(--primary-dark); margin: 1.75rem 0 .6rem; display: flex; align-items: center; gap: .5rem; }
+  .section-subtitle:first-of-type { margin-top: 0; }
+  .section-subtitle::before { content: ""; width: 4px; height: 1.1em; background: var(--primary); border-radius: 2px; }
+  .feature-text p { font-size: .95rem; color: var(--text-secondary); }
+
+  /* 操作步骤时间轴 */
+  .steps { list-style: none; position: relative; padding-left: 0; margin-top: .75rem; }
+  .steps::before { content: ""; position: absolute; left: 19px; top: 20px; bottom: 20px; width: 2px; background: #e0e6f0; }
+  .step { display: flex; align-items: flex-start; margin-bottom: 20px; position: relative; }
+  .step:last-child { margin-bottom: 0; }
+  .step-num { width: 40px; height: 40px; border-radius: 50%; background: #fff; border: 2px solid var(--primary); color: var(--primary); font-size: 16px; font-weight: bold; display: flex; align-items: center; justify-content: center; flex-shrink: 0; margin-right: 16px; z-index: 1; }
+  .step-content { flex: 1; padding-top: 4px; }
+  .step-title { font-size: 15px; font-weight: bold; color: var(--text); margin-bottom: 4px; }
+  .step-desc { font-size: 14px; color: var(--text-secondary); line-height: 1.7; }
+  .tag { display: inline-block; padding: 1px 8px; border: 1px solid var(--primary); color: var(--primary-dark); border-radius: 4px; font-size: 13px; background: #f5f9ff; font-weight: 500; }
+  .note { background: #fff8e6; border-left: 4px solid #f0ad4e; padding: .75rem 1rem; border-radius: var(--radius); margin-top: 1rem; font-size: .9rem; color: #856404; }
+  .note strong { color: #6a5300; }
+
+  @media (max-width: 900px) {
+    .steps::before { left: 17px; }
+    .step-num { width: 36px; height: 36px; font-size: 14px; margin-right: 12px; }
+  }
+
+  /* Spec Table */
+  .spec-table { width: 100%; border-collapse: collapse; margin-top: 1.5rem; font-size: .9rem; }
+  .spec-table th, .spec-table td { border: 1px solid var(--border); padding: .75rem 1rem; text-align: left; vertical-align: top; }
+  .spec-table thead { background: #f0f2f5; }
+  .spec-table th { font-weight: 700; color: var(--text); }
+  .spec-table tbody tr:nth-child(even) { background: var(--bg-alt); }
+  .spec-table td { color: var(--text-secondary); }
+
+  /* Footer */
+  .site-footer { background: #1a1a1a; color: #aaa; padding: 2.5rem 1.5rem; text-align: center; font-size: .9rem; }
+  .site-footer p { margin-bottom: .5rem; }
+
+  /* Mobile */
+  @media (max-width: 900px) {
+    .feature-row, .feature-row:nth-child(even),
+    #depth .feature-row, #plane-angle .feature-row,
+    #point-line .feature-row, #area-depth .feature-row { flex-direction: column; }
+    /* 移动端：4/6 节直接保持合并状态（静态布局） */
+    #point-line .feature-row,
+    #area-depth .feature-row {
+      justify-content: flex-start;
+      gap: 1.5rem;
+    }
+    #point-line .feature-image,
+    #area-depth .feature-image,
+    #point-line .feature-text,
+    #area-depth .feature-text {
+      order: initial;
+      flex: 0 0 100%;
+      width: 100%;
+    }
+    .feature-image { margin-top: 2rem; }
+    .hero h1 { font-size: 1.75rem; }
+    .main-nav { display: none; }
+    /* 移动端：侧边栏改为顶部水平滚动条 */
+    .page-layout { flex-direction: column; }
+    .sidebar {
+      position: static;
+      width: 100%;
+      height: auto;
+      padding: 1rem 1.5rem 0;
+    }
+    .sidebar-inner { padding: 0; box-shadow: none; border: none; border-bottom: 1px solid var(--border); border-radius: 0; background: transparent; }
+    .sidebar-title { display: none; }
+    .sidebar-nav { display: flex; gap: 1rem; overflow-x: auto; padding: .25rem 0 .5rem; }
+    .sidebar-nav li { flex-shrink: 0; }
+    .sidebar-nav a {
+      border-left: none;
+      border-bottom: 3px solid transparent;
+      border-radius: 6px;
+      padding: .5rem .85rem;
+      white-space: nowrap;
+      margin: 0;
+      transform: none;
+    }
+    .sidebar-nav a:hover,
+    .sidebar-nav a.active { transform: none; border-bottom-color: var(--primary); border-left-color: transparent; }
+  }
+</style>
+</head>
+<body>
+
+<!-- 吸顶主导航 -->
+<header class="site-header">
+  <div class="header-inner">
+    <a class="logo" href="#overview">
+      <!--<img src="https://raw.githubusercontent.com/gaojunhua1986/my-image-repo/2f2ee34a844db09a3b0b54a9c4e601c090c8377f/企业微信截图_17919502437864.png">-->
+        <img src="image/logo.png" alt="logo">
+        <div class="logo-text">
+        <span class="logo-title">RSTEK</span>
+        <span class="logo-subtitle" data-i18n="logo.subtitle">上海瑞烁信息科技有限公司</span>
+      </div>
+    </a>
+    <div class="header-right">
+      <nav class="main-nav">
+        <a href="#anomaly" data-i18n="nav.anomaly">异常处理</a>
+        <a href="#resources" data-i18n="nav.resources">资源</a>
+        <a class="cta-btn" href="#methods" data-i18n="nav.guide">查看说明</a>
+      </nav>
+      <div class="lang-switch" role="group" aria-label="Language / 语言">
+        <button type="button" class="lang-btn active" data-lang="zh">中</button>
+        <button type="button" class="lang-btn" data-lang="en">EN</button>
+      </div>
+    </div>
+  </div>
+</header>
+
+<!-- 锚点 Tab 导航 -->
+<div class="anchor-bar">
+  <div class="anchor-inner">
+    <a href="#overview" class="active" data-i18n="anchor.overview">概述</a>
+    <a href="#anomaly" data-i18n="anchor.anomaly">异常处理</a>
+  </div>
+</div>
+
+<!-- 页面主体：左侧测量功能导航 + 主内容区 -->
+<div class="page-layout">
+  <aside class="sidebar" aria-label="测量功能导航">
+    <div class="sidebar-inner">
+      <h3 class="sidebar-title" data-i18n="sidebar.title">测量功能</h3>
+      <ul class="sidebar-nav">
+        <li><a href="#point-line"><span class="sidebar-num">4</span><span data-i18n="sidebar.pointLine">点到线测量</span></a></li>
+        <li><a href="#depth"><span class="sidebar-num">5</span><span data-i18n="sidebar.depth">深度测量</span></a></li>
+        <li><a href="#area-depth"><span class="sidebar-num">6</span><span data-i18n="sidebar.areaDepth">区域深度测量</span></a></li>
+        <li><a href="#plane-angle"><span class="sidebar-num">7</span><span data-i18n="sidebar.planeAngle">平面夹角测量</span></a></li>
+      </ul>
+    </div>
+  </aside>
+  <main class="main-content">
+
+<!-- Hero -->
+<section class="hero" id="overview">
+  <div class="hero-inner">
+    <h1 data-i18n="hero.title">S101 测量功能操作说明</h1>
+    <p data-i18n="hero.desc">针对工业检测场景，提供点到线、深度、区域深度与平面夹角四类核心测量方法，帮助用户快速完成高精度三维测量与数据记录。</p>
+    <div class="hero-actions">
+      <a class="cta-btn" href="#point-line" data-i18n="hero.start">开始阅读</a>
+      <a class="cta-btn" href="#anomaly" data-i18n="hero.anomaly" style="background:transparent;color:var(--primary);border:1px solid var(--primary);">异常处理</a>
+    </div>
+  </div>
+</section>
+
+<!-- 点到线测量 -->
+<section class="section" id="point-line">
+  <div class="section-inner">
+    <div class="section-header">
+      <h2 data-i18n="s4.title">4. 点到线（点到直线距离）测量</h2>
+      <p data-i18n="s4.desc">测量目标点到基准直线的垂直距离，适用于边缘偏移、孔位中心到参考边等场景。</p>
+    </div>
+    <div class="feature-row">
+      <div class="feature-text">
+        <h3 class="section-subtitle" data-i18n="s4.sub1">4.1 适用场景</h3>
+        <p data-i18n="s4.p1">测量某一点到指定直线的垂直距离，例如：叶片边缘到基准线的距离、孔位中心到参考边的偏移量等。</p>
+        <h3 class="section-subtitle" data-i18n="s4.sub2">4.2 操作步骤</h3>
+        <ul class="steps">
+          <li class="step">
+            <div class="step-num">1</div>
+            <div class="step-content">
+              <div class="step-title" data-i18n="s4.step1.title">选择工具</div>
+              <div class="step-desc" data-i18n="s4.step1.desc">点击底部工具栏 <span class="tag">点到线</span> 按钮。</div>
+            </div>
+          </li>
+          <li class="step">
+            <div class="step-num">2</div>
+            <div class="step-content">
+              <div class="step-title" data-i18n="s4.step2.title">确定基准</div>
+              <div class="step-desc" data-i18n="s4.step2.desc">在屏幕上点击两点，确定一条基准直线。</div>
+            </div>
+          </li>
+          <li class="step">
+            <div class="step-num">3</div>
+            <div class="step-content">
+              <div class="step-title" data-i18n="s4.step3.title">选择目标</div>
+              <div class="step-desc" data-i18n="s4.step3.desc">在目标位置点击任意一点，系统自动计算垂直距离。</div>
+            </div>
+          </li>
+          <li class="step">
+            <div class="step-num">4</div>
+            <div class="step-content">
+              <div class="step-title" data-i18n="s4.step4.title">微调与保存</div>
+              <div class="step-desc" data-i18n="s4.step4.desc">若点位有偏差，点击 <span class="tag">微调</span> 重新读数。确认后点击 <span class="tag">保存</span> 或 <span class="tag">截屏</span>。</div>
+            </div>
+          </li>
+        </ul>
+        <div class="note" data-i18n="s4.note">
+          <strong>结果判读：</strong>显示数值即为目标点到基准直线的垂直距离；建议重复测量 2–3 次取一致值。基准直线两选点应位于同一平面且边缘清晰。
+        </div>
+      </div>
+      <div class="feature-image">
+        <img src="image/depth.png"alt="Depth Image">
+        <p class="caption" data-i18n="s4.caption">点到线测量示例 图 4.2</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 深度测量 -->
+<section class="section" id="depth">
+  <div class="section-inner">
+    <div class="section-header">
+      <h2 data-i18n="s5.title">5. 深度（点到平面）测量</h2>
+      <p data-i18n="s5.desc">通过三点建立基准平面，测量目标点到该平面的垂直深度，适用于凹坑、台阶高度差等场景。</p>
+    </div>
+    <div class="feature-row">
+      <div class="feature-text">
+        <h3 class="section-subtitle" data-i18n="s5.sub1">5.1 适用场景</h3>
+        <p data-i18n="s5.p1">测量某一点到指定平面的垂直深度，例如：凹坑深度、台阶高度差、平面内某一点的下沉量等。</p>
+        <h3 class="section-subtitle" data-i18n="s5.sub2">5.2 操作步骤</h3>
+        <ul class="steps">
+          <li class="step">
+            <div class="step-num">1</div>
+            <div class="step-content">
+              <div class="step-title" data-i18n="s5.step1.title">选择工具</div>
+              <div class="step-desc" data-i18n="s5.step1.desc">点击底部工具栏 <span class="tag">深度</span> 按钮。</div>
+            </div>
+          </li>
+          <li class="step">
+            <div class="step-num">2</div>
+            <div class="step-content">
+              <div class="step-title" data-i18n="s5.step2.title">建立平面</div>
+              <div class="step-desc" data-i18n="s5.step2.desc">在基准平面上点击 3 个点建立平面模型；可借助点云视图判断三点是否共面。</div>
+            </div>
+          </li>
+          <li class="step">
+            <div class="step-num">3</div>
+            <div class="step-content">
+              <div class="step-title" data-i18n="s5.step3.title">选择目标</div>
+              <div class="step-desc" data-i18n="s5.step3.desc">在需要测量的位置点击任意一点。</div>
+            </div>
+          </li>
+          <li class="step">
+            <div class="step-num">4</div>
+            <div class="step-content">
+              <div class="step-title" data-i18n="s5.step4.title">读数与保存</div>
+              <div class="step-desc" data-i18n="s5.step4.desc">系统自动计算并显示深度值。确认后点击 <span class="tag">保存</span> 或 <span class="tag">截屏</span>。</div>
+            </div>
+          </li>
+        </ul>
+      </div>
+      <div class="feature-image">
+        <img src="image/area-depth.png"alt ="Area Depth Image">
+        <p class="caption" data-i18n="s5.caption">深度测量示例 图 5.2</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 区域深度测量 -->
+<section class="section" id="area-depth">
+  <div class="section-inner">
+    <div class="section-header">
+      <h2 data-i18n="s6.title">6. 区域深度测量</h2>
+      <p data-i18n="s6.desc">在选定区域内评估各点相对基准平面的深度分布，支持拖动测量点获取最大深度值。</p>
+    </div>
+    <div class="feature-row">
+      <div class="feature-text">
+        <h3 class="section-subtitle" data-i18n="s6.sub1">6.1 适用场景</h3>
+        <p data-i18n="s6.p1">测量指定区域内各点相对基准平面的深度分布，例如：凹坑最大深度、腐蚀区域深度、磨损面下沉量等。</p>
+        <h3 class="section-subtitle" data-i18n="s6.sub2">6.2 操作步骤</h3>
+        <ul class="steps">
+          <li class="step">
+            <div class="step-num">1</div>
+            <div class="step-content">
+              <div class="step-title" data-i18n="s6.step1.title">选择工具</div>
+              <div class="step-desc" data-i18n="s6.step1.desc">在测量模式下选择 <span class="tag">区域深度</span> 按钮。</div>
+            </div>
+          </li>
+          <li class="step">
+            <div class="step-num">2</div>
+            <div class="step-content">
+              <div class="step-title" data-i18n="s6.step2.title">建立基准</div>
+              <div class="step-desc" data-i18n="s6.step2.desc">在区域较高平面上点击 3 个点，建立基准平面。</div>
+            </div>
+          </li>
+          <li class="step">
+            <div class="step-num">3</div>
+            <div class="step-content">
+              <div class="step-title" data-i18n="s6.step3.title">定位测量点</div>
+              <div class="step-desc" data-i18n="s6.step3.desc">系统自动生成 4 号深度点，拖动该点可读取不同位置深度。</div>
+            </div>
+          </li>
+          <li class="step">
+            <div class="step-num">4</div>
+            <div class="step-content">
+              <div class="step-title" data-i18n="s6.step4.title">记录结果</div>
+              <div class="step-desc" data-i18n="s6.step4.desc">拖动过程中取最大值作为区域最大深度，点击 <span class="tag">保存</span> 并记录凹坑最深处数值。</div>
+            </div>
+          </li>
+        </ul>
+        <div class="note" data-i18n="s6.note">
+          <strong>结果判读：</strong>拖动 4 号点过程中显示的数值即区域内该点到标定平面的深度；取拖动过程中的最大值作为区域最大深度。
+        </div>
+      </div>
+      <div class="feature-image">
+        <img src="image/plane-angle.png"  alt="Plane Angle Image">
+        <p class="caption" data-i18n="s6.caption">区域深度测量示例 图 6.2</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 平面夹角测量 -->
+<section class="section" id="plane-angle">
+  <div class="section-inner">
+    <div class="section-header">
+      <h2 data-i18n="s7.title">7. 平面夹角测量</h2>
+      <p data-i18n="s7.desc">分别拟合两个空间平面，自动计算并显示二者之间的夹角，适用于装配面、坡口等角度检测。</p>
+    </div>
+    <div class="feature-row">
+      <div class="feature-text">
+        <h3 class="section-subtitle" data-i18n="s7.sub1">7.1 适用场景</h3>
+        <p data-i18n="s7.p1">测量两个空间平面的夹角，例如：装配面角度、坡口角度、结构件相对角度等。</p>
+        <h3 class="section-subtitle" data-i18n="s7.sub2">7.2 操作步骤</h3>
+        <ul class="steps">
+          <li class="step">
+            <div class="step-num">1</div>
+            <div class="step-content">
+              <div class="step-title" data-i18n="s7.step1.title">选择工具</div>
+              <div class="step-desc" data-i18n="s7.step1.desc">点击底部工具栏 <span class="tag">平面夹角</span> 按钮。</div>
+            </div>
+          </li>
+          <li class="step">
+            <div class="step-num">2</div>
+            <div class="step-content">
+              <div class="step-title" data-i18n="s7.step2.title">拟合第一个平面</div>
+              <div class="step-desc" data-i18n="s7.step2.desc">在第一个平面上点击至少 3 个点，用于拟合平面。</div>
+            </div>
+          </li>
+          <li class="step">
+            <div class="step-num">3</div>
+            <div class="step-content">
+              <div class="step-title" data-i18n="s7.step3.title">拟合第二个平面</div>
+              <div class="step-desc" data-i18n="s7.step3.desc">在第二个平面上点击至少 3 个点，用于拟合平面。</div>
+            </div>
+          </li>
+          <li class="step">
+            <div class="step-num">4</div>
+            <div class="step-content">
+              <div class="step-title" data-i18n="s7.step4.title">读数与保存</div>
+              <div class="step-desc" data-i18n="s7.step4.desc">系统自动计算并显示两平面夹角。确认后点击 <span class="tag">保存</span> 或 <span class="tag">截屏</span>。</div>
+            </div>
+          </li>
+        </ul>
+      </div>
+      <div class="feature-image">
+        <img src="image/point-line.png" alt="Point Line Image">
+        <p class="caption" data-i18n="s7.caption">平面夹角测量示例 图 7.2</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 异常处理 -->
+<section class="section" id="anomaly">
+  <div class="section-inner">
+    <div class="section-header">
+      <h2 data-i18n="anomaly.title">5.3 深度测量异常处理</h2>
+      <p data-i18n="anomaly.desc">当深度测量出现无法建面、数值跳动或目标点无法选取时，可参考下表进行排查。</p>
+    </div>
+    <table class="spec-table">
+      <thead>
+        <tr>
+          <th data-i18n="anomaly.th1">现象</th>
+          <th data-i18n="anomaly.th2">可能原因</th>
+          <th data-i18n="anomaly.th3">处理方法</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td data-i18n="anomaly.r1c1">无法建立平面</td>
+          <td data-i18n="anomaly.r1c2">平面三点不在同一平面或点云不完整。</td>
+          <td data-i18n="anomaly.r1c3">重新在平整区域取点，或使用点云染色确认同一高度后再取点。</td>
+        </tr>
+        <tr>
+          <td data-i18n="anomaly.r2c1">深度值跳动大</td>
+          <td data-i18n="anomaly.r2c2">镜头未垂直于被测面、点云精度不足。</td>
+          <td data-i18n="anomaly.r2c3">按 8.1 进行垂直调试；对点云执行 AI 优化后重测。</td>
+        </tr>
+        <tr>
+          <td data-i18n="anomaly.r3c1">目标点无法选取</td>
+          <td data-i18n="anomaly.r3c2">目标点处于点云范围外（红点）。</td>
+          <td data-i18n="anomaly.r3c3">重新选点或重新拍摄测量图。</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+  </main><!-- /.main-content -->
+</div><!-- /.page-layout -->
+
+<!-- Footer -->
+<footer class="site-footer" id="resources">
+  <p data-i18n="footer.line1">S101 测量功能操作说明 · 技术支持与资源下载</p>
+  <p data-i18n="footer.line2">© 2026 Wabtec IMS. 保留所有权利。</p>
+</footer>
+
+<script>
+  // 锚点 Tab 高亮 + 左侧测量功能导航同步高亮
+  const sections = document.querySelectorAll('.section, .hero');
+  const anchors = document.querySelectorAll('.anchor-inner a');
+  const sidebarLinks = document.querySelectorAll('.sidebar-nav a');
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        // 顶部锚点 Tab
+        anchors.forEach(a => a.classList.remove('active'));
+        const id = entry.target.id;
+        const active = document.querySelector(`.anchor-inner a[href="#${id}"]`);
+        if (active) active.classList.add('active');
+        // 左侧侧边栏（仅同步测量功能 4 个章节）
+        const measureIds = ['point-line', 'depth', 'area-depth', 'plane-angle'];
+        sidebarLinks.forEach(a => a.classList.remove('active'));
+        if (measureIds.includes(id)) {
+          const sideActive = document.querySelector(`.sidebar-nav a[href="#${id}"]`);
+          if (sideActive) sideActive.classList.add('active');
+        }
+      }
+    });
+  }, { rootMargin: '-50% 0px -50% 0px' });
+  sections.forEach(section => observer.observe(section));
+
+  // 4. 点到线 与 6. 区域深度：每次进入视口时合并，离开时分离
+  const animRows = document.querySelectorAll('#point-line .feature-row, #area-depth .feature-row');
+  const animObserver = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        entry.target.classList.add('in-view');
+      } else {
+        entry.target.classList.remove('in-view');
+      }
+    });
+  }, { threshold: 0.25, rootMargin: '0px 0px -8% 0px' });
+  animRows.forEach(row => animObserver.observe(row));
+</script>
+
+<script>
+  /* ================= 中英文语言包 ================= */
+  var I18N = {
+    zh: {
+      'logo.subtitle': '上海瑞烁信息科技有限公司',
+      'nav.anomaly': '异常处理',
+      'nav.resources': '资源',
+      'nav.guide': '查看说明',
+      'anchor.overview': '概述',
+      'anchor.anomaly': '异常处理',
+      'sidebar.title': '测量功能',
+      'sidebar.pointLine': '点到线测量',
+      'sidebar.depth': '深度测量',
+      'sidebar.areaDepth': '区域深度测量',
+      'sidebar.planeAngle': '平面夹角测量',
+      'hero.title': 'S101 测量功能操作说明',
+      'hero.desc': '针对工业检测场景，提供点到线、深度、区域深度与平面夹角四类核心测量方法，帮助用户快速完成高精度三维测量与数据记录。',
+      'hero.start': '开始阅读',
+      'hero.anomaly': '异常处理',
+      's4.title': '4. 点到线（点到直线距离）测量',
+      's4.desc': '测量目标点到基准直线的垂直距离，适用于边缘偏移、孔位中心到参考边等场景。',
+      's4.sub1': '4.1 适用场景',
+      's4.p1': '测量某一点到指定直线的垂直距离，例如：叶片边缘到基准线的距离、孔位中心到参考边的偏移量等。',
+      's4.sub2': '4.2 操作步骤',
+      's4.step1.title': '选择工具',
+      's4.step1.desc': '点击底部工具栏 <span class="tag">点到线</span> 按钮。',
+      's4.step2.title': '确定基准',
+      's4.step2.desc': '在屏幕上点击两点，确定一条基准直线。',
+      's4.step3.title': '选择目标',
+      's4.step3.desc': '在目标位置点击任意一点，系统自动计算垂直距离。',
+      's4.step4.title': '微调与保存',
+      's4.step4.desc': '若点位有偏差，点击 <span class="tag">微调</span> 重新读数。确认后点击 <span class="tag">保存</span> 或 <span class="tag">截屏</span>。',
+      's4.note': '<strong>结果判读：</strong>显示数值即为目标点到基准直线的垂直距离；建议重复测量 2–3 次取一致值。基准直线两选点应位于同一平面且边缘清晰。',
+      's4.caption': '点到线测量示例 图 4.2',
+      's5.title': '5. 深度（点到平面）测量',
+      's5.desc': '通过三点建立基准平面，测量目标点到该平面的垂直深度，适用于凹坑、台阶高度差等场景。',
+      's5.sub1': '5.1 适用场景',
+      's5.p1': '测量某一点到指定平面的垂直深度，例如：凹坑深度、台阶高度差、平面内某一点的下沉量等。',
+      's5.sub2': '5.2 操作步骤',
+      's5.step1.title': '选择工具',
+      's5.step1.desc': '点击底部工具栏 <span class="tag">深度</span> 按钮。',
+      's5.step2.title': '建立平面',
+      's5.step2.desc': '在基准平面上点击 3 个点建立平面模型；可借助点云视图判断三点是否共面。',
+      's5.step3.title': '选择目标',
+      's5.step3.desc': '在需要测量的位置点击任意一点。',
+      's5.step4.title': '读数与保存',
+      's5.step4.desc': '系统自动计算并显示深度值。确认后点击 <span class="tag">保存</span> 或 <span class="tag">截屏</span>。',
+      's5.caption': '深度测量示例 图 5.2',
+      's6.title': '6. 区域深度测量',
+      's6.desc': '在选定区域内评估各点相对基准平面的深度分布，支持拖动测量点获取最大深度值。',
+      's6.sub1': '6.1 适用场景',
+      's6.p1': '测量指定区域内各点相对基准平面的深度分布，例如：凹坑最大深度、腐蚀区域深度、磨损面下沉量等。',
+      's6.sub2': '6.2 操作步骤',
+      's6.step1.title': '选择工具',
+      's6.step1.desc': '在测量模式下选择 <span class="tag">区域深度</span> 按钮。',
+      's6.step2.title': '建立基准',
+      's6.step2.desc': '在区域较高平面上点击 3 个点，建立基准平面。',
+      's6.step3.title': '定位测量点',
+      's6.step3.desc': '系统自动生成 4 号深度点，拖动该点可读取不同位置深度。',
+      's6.step4.title': '记录结果',
+      's6.step4.desc': '拖动过程中取最大值作为区域最大深度，点击 <span class="tag">保存</span> 并记录凹坑最深处数值。',
+      's6.note': '<strong>结果判读：</strong>拖动 4 号点过程中显示的数值即区域内该点到标定平面的深度；取拖动过程中的最大值作为区域最大深度。',
+      's6.caption': '区域深度测量示例 图 6.2',
+      's7.title': '7. 平面夹角测量',
+      's7.desc': '分别拟合两个空间平面，自动计算并显示二者之间的夹角，适用于装配面、坡口等角度检测。',
+      's7.sub1': '7.1 适用场景',
+      's7.p1': '测量两个空间平面的夹角，例如：装配面角度、坡口角度、结构件相对角度等。',
+      's7.sub2': '7.2 操作步骤',
+      's7.step1.title': '选择工具',
+      's7.step1.desc': '点击底部工具栏 <span class="tag">平面夹角</span> 按钮。',
+      's7.step2.title': '拟合第一个平面',
+      's7.step2.desc': '在第一个平面上点击至少 3 个点，用于拟合平面。',
+      's7.step3.title': '拟合第二个平面',
+      's7.step3.desc': '在第二个平面上点击至少 3 个点，用于拟合平面。',
+      's7.step4.title': '读数与保存',
+      's7.step4.desc': '系统自动计算并显示两平面夹角。确认后点击 <span class="tag">保存</span> 或 <span class="tag">截屏</span>。',
+      's7.caption': '平面夹角测量示例 图 7.2',
+      'anomaly.title': '5.3 深度测量异常处理',
+      'anomaly.desc': '当深度测量出现无法建面、数值跳动或目标点无法选取时，可参考下表进行排查。',
+      'anomaly.th1': '现象',
+      'anomaly.th2': '可能原因',
+      'anomaly.th3': '处理方法',
+      'anomaly.r1c1': '无法建立平面',
+      'anomaly.r1c2': '平面三点不在同一平面或点云不完整。',
+      'anomaly.r1c3': '重新在平整区域取点，或使用点云染色确认同一高度后再取点。',
+      'anomaly.r2c1': '深度值跳动大',
+      'anomaly.r2c2': '镜头未垂直于被测面、点云精度不足。',
+      'anomaly.r2c3': '按 8.1 进行垂直调试；对点云执行 AI 优化后重测。',
+      'anomaly.r3c1': '目标点无法选取',
+      'anomaly.r3c2': '目标点处于点云范围外（红点）。',
+      'anomaly.r3c3': '重新选点或重新拍摄测量图。',
+      'footer.line1': 'S101 测量功能操作说明 · 技术支持与资源下载',
+      'footer.line2': '© 2026 Wabtec IMS. 保留所有权利。'
+    },
+    en: {
+      'logo.subtitle': 'Shanghai RSTEK Information Technology Co., Ltd.',
+      'nav.anomaly': 'Troubleshooting',
+      'nav.resources': 'Resources',
+      'nav.guide': 'View Guide',
+      'anchor.overview': 'Overview',
+      'anchor.anomaly': 'Troubleshooting',
+      'sidebar.title': 'Measurement Functions',
+      'sidebar.pointLine': 'Point-to-Line',
+      'sidebar.depth': 'Depth',
+      'sidebar.areaDepth': 'Area Depth',
+      'sidebar.planeAngle': 'Plane Angle',
+      'hero.title': 'S101 Measurement Function Operation Guide',
+      'hero.desc': 'Designed for industrial inspection, this guide covers four core measurement methods — point-to-line, depth, area depth and plane angle — helping users quickly complete high-precision 3D measurement and data recording.',
+      'hero.start': 'Start Reading',
+      'hero.anomaly': 'Troubleshooting',
+      's4.title': '4. Point-to-Line (Point-to-Straight-Line Distance) Measurement',
+      's4.desc': 'Measure the perpendicular distance from a target point to a reference line. Suitable for edge offset, hole-center-to-reference-edge and similar scenarios.',
+      's4.sub1': '4.1 Applicable Scenarios',
+      's4.p1': 'Measure the perpendicular distance from a point to a specified line, for example the distance from a blade edge to the reference line, or the offset from a hole center to the reference edge.',
+      's4.sub2': '4.2 Operating Steps',
+      's4.step1.title': 'Select Tool',
+      's4.step1.desc': 'Click the <span class="tag">Point-to-Line</span> button on the bottom toolbar.',
+      's4.step2.title': 'Define the Reference',
+      's4.step2.desc': 'Click two points on the screen to define a reference line.',
+      's4.step3.title': 'Select the Target',
+      's4.step3.desc': 'Click any point at the target position; the system calculates the perpendicular distance automatically.',
+      's4.step4.title': 'Fine-tune and Save',
+      's4.step4.desc': 'If the point deviates, click <span class="tag">Fine-tune</span> to read again. After confirming, click <span class="tag">Save</span> or <span class="tag">Screenshot</span>.',
+      's4.note': '<strong>Result interpretation:</strong> the displayed value is the perpendicular distance from the target point to the reference line; it is recommended to repeat the measurement 2–3 times and take a consistent value. The two points defining the reference line should lie on the same plane with clear edges.',
+      's4.caption': 'Point-to-Line measurement example — Figure 4.2',
+      's5.title': '5. Depth (Point-to-Plane) Measurement',
+      's5.desc': 'Establish a reference plane through three points and measure the perpendicular depth from the target point to that plane. Suitable for pits, step height differences and similar scenarios.',
+      's5.sub1': '5.1 Applicable Scenarios',
+      's5.p1': 'Measure the perpendicular depth from a point to a specified plane, for example the depth of a pit, a step height difference, or the subsidence of a point within a plane.',
+      's5.sub2': '5.2 Operating Steps',
+      's5.step1.title': 'Select Tool',
+      's5.step1.desc': 'Click the <span class="tag">Depth</span> button on the bottom toolbar.',
+      's5.step2.title': 'Establish the Plane',
+      's5.step2.desc': 'Click 3 points on the reference plane to build a plane model; use the point-cloud view to check whether the three points are coplanar.',
+      's5.step3.title': 'Select the Target',
+      's5.step3.desc': 'Click any point at the position to be measured.',
+      's5.step4.title': 'Read and Save',
+      's5.step4.desc': 'The system calculates and displays the depth value automatically. After confirming, click <span class="tag">Save</span> or <span class="tag">Screenshot</span>.',
+      's5.caption': 'Depth measurement example — Figure 5.2',
+      's6.title': '6. Area Depth Measurement',
+      's6.desc': 'Evaluate the depth distribution of each point relative to the reference plane within a selected area. Supports dragging the measurement point to obtain the maximum depth value.',
+      's6.sub1': '6.1 Applicable Scenarios',
+      's6.p1': 'Measure the depth distribution of each point relative to the reference plane within a specified area, for example the maximum depth of a pit, the depth of a corroded area, or the subsidence of a worn surface.',
+      's6.sub2': '6.2 Operating Steps',
+      's6.step1.title': 'Select Tool',
+      's6.step1.desc': 'In measurement mode, select the <span class="tag">Area Depth</span> button.',
+      's6.step2.title': 'Establish the Reference',
+      's6.step2.desc': 'Click 3 points on the higher plane of the area to establish the reference plane.',
+      's6.step3.title': 'Position the Measurement Point',
+      's6.step3.desc': 'The system automatically generates depth point No. 4; drag this point to read the depth at different positions.',
+      's6.step4.title': 'Record the Result',
+      's6.step4.desc': 'During dragging, take the maximum value as the maximum depth of the area. Click <span class="tag">Save</span> and record the deepest value of the pit.',
+      's6.note': '<strong>Result interpretation:</strong> the value displayed while dragging point No. 4 is the depth from that point in the area to the calibrated plane; take the maximum value during dragging as the maximum depth of the area.',
+      's6.caption': 'Area depth measurement example — Figure 6.2',
+      's7.title': '7. Plane Angle Measurement',
+      's7.desc': 'Fit two spatial planes separately to calculate and display the angle between them automatically. Suitable for angle inspection of assembly surfaces, grooves and similar features.',
+      's7.sub1': '7.1 Applicable Scenarios',
+      's7.p1': 'Measure the angle between two spatial planes, for example the angle of an assembly surface, a groove angle, or the relative angle of structural parts.',
+      's7.sub2': '7.2 Operating Steps',
+      's7.step1.title': 'Select Tool',
+      's7.step1.desc': 'Click the <span class="tag">Plane Angle</span> button on the bottom toolbar.',
+      's7.step2.title': 'Fit the First Plane',
+      's7.step2.desc': 'Click at least 3 points on the first plane to fit the plane.',
+      's7.step3.title': 'Fit the Second Plane',
+      's7.step3.desc': 'Click at least 3 points on the second plane to fit the plane.',
+      's7.step4.title': 'Read and Save',
+      's7.step4.desc': 'The system calculates and displays the angle between the two planes automatically. After confirming, click <span class="tag">Save</span> or <span class="tag">Screenshot</span>.',
+      's7.caption': 'Plane angle measurement example — Figure 7.2',
+      'anomaly.title': '5.3 Depth Measurement Troubleshooting',
+      'anomaly.desc': 'When depth measurement fails to build a plane, the value fluctuates, or the target point cannot be selected, refer to the table below for troubleshooting.',
+      'anomaly.th1': 'Symptom',
+      'anomaly.th2': 'Possible Cause',
+      'anomaly.th3': 'Solution',
+      'anomaly.r1c1': 'Unable to build a plane',
+      'anomaly.r1c2': 'The three points are not on the same plane, or the point cloud is incomplete.',
+      'anomaly.r1c3': 'Pick points again in a flat area, or use point-cloud coloring to confirm the same height before picking points.',
+      'anomaly.r2c1': 'Large depth value fluctuation',
+      'anomaly.r2c2': 'The lens is not perpendicular to the measured surface, or the point-cloud accuracy is insufficient.',
+      'anomaly.r2c3': 'Perform the vertical adjustment described in 8.1; run AI optimization on the point cloud and measure again.',
+      'anomaly.r3c1': 'Target point cannot be selected',
+      'anomaly.r3c2': 'The target point is outside the point-cloud range (red dot).',
+      'anomaly.r3c3': 'Select the point again or re-capture the measurement image.',
+      'footer.line1': 'S101 Measurement Function Operation Guide · Technical Support & Resource Download',
+      'footer.line2': '© 2026 Wabtec IMS. All rights reserved.'
+    }
+  };
+
+  var TITLE_I18N = {
+    zh: 'S101 测量功能操作说明',
+    en: 'S101 Measurement Function Operation Guide'
+  };
+
+  function applyLang(lang) {
+    var dict = I18N[lang] || I18N.zh;
+    var nodes = document.querySelectorAll('[data-i18n]');
+    for (var i = 0; i < nodes.length; i++) {
+      var key = nodes[i].getAttribute('data-i18n');
+      if (dict[key] != null) nodes[i].innerHTML = dict[key];
+    }
+    document.documentElement.lang = (lang === 'en') ? 'en' : 'zh-CN';
+    document.title = TITLE_I18N[lang] || TITLE_I18N.zh;
+    var btns = document.querySelectorAll('.lang-btn');
+    for (var j = 0; j < btns.length; j++) {
+      btns[j].classList.toggle('active', btns[j].getAttribute('data-lang') === lang);
+    }
+    try { localStorage.setItem('s101-lang', lang); } catch (e) {}
+  }
+
+  var langBtns = document.querySelectorAll('.lang-btn');
+  for (var k = 0; k < langBtns.length; k++) {
+    langBtns[k].addEventListener('click', function () {
+      applyLang(this.getAttribute('data-lang'));
+    });
+  }
+
+  var savedLang = 'zh';
+  try { savedLang = localStorage.getItem('s101-lang') || 'zh'; } catch (e) {}
+  applyLang(savedLang);
+</script>
+
+</body>
+</html>
